@@ -5,6 +5,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: script
+        shell: bash
+        run: |
+          pwd
+          ps -lah ./
 
       - uses: actions/cache@v2
         with:
