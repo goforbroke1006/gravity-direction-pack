@@ -23,7 +23,7 @@ jobs:
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
-          projectPath: /home/runner/work/gravity-direction-pack/gravity-direction-pack
+          projectPath: ./
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/upload-artifact@v2
