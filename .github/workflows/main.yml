@@ -8,7 +8,7 @@ jobs:
 
       - uses: actions/cache@v2
         with:
-          path: ./Library
+          path: /home/runner/work/gravity-direction-pack/gravity-direction-pack/Library
           key: Library-gravity-direction-pack-TargetPlatform_ANY
           restore-keys: |
             Library-gravity-direction-pack-
@@ -18,7 +18,7 @@ jobs:
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
-          projectPath: ./Assets/GravityDirectionPack
+          projectPath: /home/runner/work/gravity-direction-pack/gravity-direction-pack
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/upload-artifact@v2
