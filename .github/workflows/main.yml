@@ -9,7 +9,7 @@ jobs:
         shell: bash
         run: |
           pwd
-          ps -lah ./
+          ls -lah ./
 
       - uses: actions/cache@v2
         with:
