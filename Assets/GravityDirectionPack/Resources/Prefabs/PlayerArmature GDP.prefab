@@ -1989,8 +1989,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7930709683248421015}
   - component: {fileID: 4102681011743621869}
-  - component: {fileID: 7297057200213951015}
-  - component: {fileID: 7811057981634399694}
+  - component: {fileID: 8731907438059444448}
+  - component: {fileID: 4112380252464507542}
+  - component: {fileID: 3998458333483398780}
   m_Layer: 8
   m_Name: PlayerArmature GDP
   m_TagString: Player
@@ -2036,8 +2037,8 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!143 &7297057200213951015
-CharacterController:
+--- !u!136 &8731907438059444448
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2046,15 +2047,25 @@ CharacterController:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 2
+  m_Radius: 0.25
   m_Height: 1.8
-  m_Radius: 0.28
-  m_SlopeLimit: 45
-  m_StepOffset: 0.25
-  m_SkinWidth: 0.02
-  m_MinMoveDistance: 0
-  m_Center: {x: 0, y: 0.93, z: 0}
---- !u!114 &7811057981634399694
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &4112380252464507542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7297057200213951021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24e44624fa0f56942937ea62706cc642, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 0.25
+  center: {x: 0, y: 0, z: 0}
+--- !u!114 &3998458333483398780
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2066,12 +2077,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17bead187a5721d4fa683da9f59c9f1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gravityDirection: 1
   groundLayers:
     serializedVersion: 2
     m_Bits: 1
   LandingAudioClip: {fileID: 8300000, guid: a4cb35ccde466d643b0d9ec644e5eacc, type: 3}
   FootstepAudioVolume: 0.5
   grounded: 1
+  fallingSpeed: 0
 --- !u!1 &7407615755145786993
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,12 +5,14 @@ namespace GravityDirectionPack.Scripts
     [RequireComponent(typeof(CharacterController))]
     public class ThirdPersonController : MonoBehaviour
     {
+        public GravityDirection gravityDirection = GravityDirection.YNegative;
         public LayerMask groundLayers;
-        
+
         public AudioClip LandingAudioClip;
         [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
 
-        [Header("State flags")] public bool grounded = true;
+        [Header("State")] public bool grounded = true;
+        public float fallingSpeed = 0;
 
         private CharacterController _controller;
         private Animator _animator;
@@ -46,22 +48,23 @@ namespace GravityDirectionPack.Scripts
 
         private void OnDrawGizmosSelected()
         {
-#if UNITY_EDITOR
+// #if UNITY_EDITOR
             if (_controller == null)
             {
                 _controller = GetComponent<CharacterController>();
             }
 
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawWireSphere(GetGroundedSphereLocation(), GetGroundedSphereRadius());
-#endif
+            // Gizmos.color = Color.magenta;
+            // Gizmos.DrawWireSphere(GetGroundedSphereLocation(), GetGroundedSphereRadius());
+// #endif
         }
-        
+
         private void OnLand(AnimationEvent animationEvent)
         {
             if (animationEvent.animatorClipInfo.weight > 0.5f)
             {
-                AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
+                AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center),
+                    FootstepAudioVolume);
             }
         }
 
@@ -76,6 +79,8 @@ namespace GravityDirectionPack.Scripts
         {
             if (grounded)
             {
+                fallingSpeed = 0;
+                
                 // update animator if using character
                 if (_hasAnimator)
                 {
@@ -85,7 +90,8 @@ namespace GravityDirectionPack.Scripts
             }
             else
             {
-                _controller.Move(new Vector3(0.0f, -1.2f, 0.0f) * Time.deltaTime);
+                fallingSpeed += 0.8f;
+                
                 if (_hasAnimator)
                 {
                     _animator.SetBool(_animIDFreeFall, true);
