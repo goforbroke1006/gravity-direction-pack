@@ -26,7 +26,6 @@ namespace GravityDirectionPack.Tests.Runtime
             GameObject ch = Object.Instantiate(getCharRes());
             ch.transform.position = new Vector3(2.03f, 3.109f, 1.18f);
             ch.transform.rotation = Quaternion.Euler(0, 0, 0);
-            ch.GetComponent<Scripts.ThirdPersonController>().gravityDirection = GravityDirection.YNegative;
 
             yield return new WaitForSeconds(2.0f);
 
@@ -59,7 +58,6 @@ namespace GravityDirectionPack.Tests.Runtime
             GameObject ch = Object.Instantiate(getCharRes());
             ch.transform.position = new Vector3(2.03f, 1.109f, 1.18f);
             ch.transform.rotation = Quaternion.Euler(0, 0, 90.0f);
-            ch.GetComponent<Scripts.ThirdPersonController>().gravityDirection = GravityDirection.XPositive;
 
             yield return new WaitForSeconds(2.0f);
 

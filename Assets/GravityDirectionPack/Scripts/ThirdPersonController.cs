@@ -1,11 +1,15 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace GravityDirectionPack.Scripts
 {
+    /// <summary>
+    /// Third person controller with movement, jumping and animation
+    /// </summary>
     [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(InputsReader))]
     public class ThirdPersonController : MonoBehaviour
     {
-        public GravityDirection gravityDirection = GravityDirection.YNegative;
         public LayerMask groundLayers;
 
         public AudioClip LandingAudioClip;
@@ -17,6 +21,7 @@ namespace GravityDirectionPack.Scripts
         private CharacterController _controller;
         private Animator _animator;
         private bool _hasAnimator;
+        private InputsReader _input;
 
         // animation IDs
         private int _animIDGrounded;
@@ -28,10 +33,7 @@ namespace GravityDirectionPack.Scripts
         {
             _controller = GetComponent<CharacterController>();
             _hasAnimator = TryGetComponent(out _animator);
-            if (_hasAnimator)
-            {
-                Debug.Log("animator found");
-            }
+            _input = GetComponent<InputsReader>();
 
             AssignAnimationIDs();
         }
@@ -48,7 +50,7 @@ namespace GravityDirectionPack.Scripts
 
         private void OnDrawGizmosSelected()
         {
-// #if UNITY_EDITOR
+#if UNITY_EDITOR
             if (_controller == null)
             {
                 _controller = GetComponent<CharacterController>();
@@ -56,7 +58,7 @@ namespace GravityDirectionPack.Scripts
 
             // Gizmos.color = Color.magenta;
             // Gizmos.DrawWireSphere(GetGroundedSphereLocation(), GetGroundedSphereRadius());
-// #endif
+#endif
         }
 
         private void OnLand(AnimationEvent animationEvent)
@@ -79,8 +81,9 @@ namespace GravityDirectionPack.Scripts
         {
             if (grounded)
             {
-                fallingSpeed = 0;
-                
+                if (fallingSpeed > 0.1f)
+                    fallingSpeed = 0;
+
                 // update animator if using character
                 if (_hasAnimator)
                 {
@@ -91,7 +94,7 @@ namespace GravityDirectionPack.Scripts
             else
             {
                 fallingSpeed += 0.8f;
-                
+
                 if (_hasAnimator)
                 {
                     _animator.SetBool(_animIDFreeFall, true);
@@ -112,6 +115,9 @@ namespace GravityDirectionPack.Scripts
 
         private void Move()
         {
+            Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+            _controller.Move(inputDirection * (15.0f * Time.deltaTime));
+
             // update animator if using character
             if (_hasAnimator)
             {

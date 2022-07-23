@@ -80,7 +80,6 @@ namespace GravityDirectionPack.Tests.Runtime
             GameObject ch = Object.Instantiate(getCharRes());
             ch.transform.position = new Vector3(5.0f, 1.109f, 1.18f);
             ch.transform.rotation = Quaternion.Euler(0, 0, 90.0f);
-            ch.GetComponent<Scripts.ThirdPersonController>().gravityDirection = GravityDirection.XPositive;
 
             yield return null;
 
