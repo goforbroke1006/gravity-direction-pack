@@ -10,13 +10,8 @@ namespace GravityDirectionPack.Scripts
     [RequireComponent(typeof(InputsReader))]
     public class ThirdPersonController : MonoBehaviour
     {
-        public LayerMask groundLayers;
-
         public AudioClip LandingAudioClip;
         [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
-
-        [Header("State")] public bool grounded = true;
-        public float fallingSpeed = 0;
 
         private CharacterController _controller;
         private Animator _animator;
@@ -44,7 +39,6 @@ namespace GravityDirectionPack.Scripts
             //_hasAnimator = TryGetComponent(out _animator);
 
             JumpAndGravity();
-            GroundedCheck();
             Move();
         }
 
@@ -79,22 +73,17 @@ namespace GravityDirectionPack.Scripts
 
         private void JumpAndGravity()
         {
-            if (grounded)
+            if (_controller.grounded)
             {
-                if (fallingSpeed > 0.1f)
-                    fallingSpeed = 0;
-
                 // update animator if using character
                 if (_hasAnimator)
                 {
                     _animator.SetBool(_animIDFreeFall, false);
-                    _animator.SetBool(_animIDGrounded, grounded);
+                    _animator.SetBool(_animIDGrounded, true);
                 }
             }
             else
             {
-                fallingSpeed += 0.8f;
-
                 if (_hasAnimator)
                 {
                     _animator.SetBool(_animIDFreeFall, true);
@@ -102,15 +91,6 @@ namespace GravityDirectionPack.Scripts
 
                 // TODO: disable jumping
             }
-        }
-
-        private void GroundedCheck()
-        {
-            grounded = Physics.CheckSphere(
-                GetGroundedSphereLocation(),
-                GetGroundedSphereRadius(),
-                groundLayers,
-                QueryTriggerInteraction.Ignore);
         }
 
         private void Move()
@@ -125,14 +105,6 @@ namespace GravityDirectionPack.Scripts
             }
         }
 
-        private Vector3 GetGroundedSphereLocation()
-        {
-            return transform.position + transform.rotation * Vector3.down * (-1 * GetGroundedSphereRadius());
-        }
-
-        private float GetGroundedSphereRadius()
-        {
-            return _controller.radius;
-        }
+        
     }
 }

@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.0.0] - 2022-07-24
+### Added
+- Input actions and inputs reader
+
+### Changed 
+- Component **GravityDirectionSystem** controls **CharacterController**,
+  because this kind calculation more related to physics, not to character controlling with player.
+
+
 ## [v0.0.0] - 2022-07-23
 ### Added
 - Component and prefab **GravityDirectionSystem** (ECS system) to control falling 

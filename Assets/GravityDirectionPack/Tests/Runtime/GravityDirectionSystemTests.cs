@@ -5,7 +5,7 @@ using UnityEngine.TestTools;
 
 namespace GravityDirectionPack.Tests.Runtime
 {
-    public class GravityDirectionSystem
+    public class GravityDirectionSystemTests
     {
         private const float MaxStuckInFloorDelta = 0.1f;
 

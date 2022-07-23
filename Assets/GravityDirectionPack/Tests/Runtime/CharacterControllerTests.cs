@@ -3,10 +3,11 @@ using GravityDirectionPack.Scripts;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using CharacterController = GravityDirectionPack.Scripts.CharacterController;
 
 namespace GravityDirectionPack.Tests.Runtime
 {
-    public class ThirdPersonController
+    public class CharacterControllerTests
     {
         private const float UpdateFrameFastExec = 1.0f;
         private const float UpdateFrameSlowExec = 25.0f;
@@ -28,7 +29,7 @@ namespace GravityDirectionPack.Tests.Runtime
             GameObject ch = Object.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerArmature GDP"));
             ch.transform.position = new Vector3(-1.711f, 0, 1.130581f);
             yield return null;
-            Assert.IsTrue(ch.GetComponent<Scripts.ThirdPersonController>().grounded);
+            Assert.IsTrue(ch.GetComponent<CharacterController>().grounded);
 
             Object.Destroy(env);
             Object.Destroy(cam);
@@ -55,7 +56,7 @@ namespace GravityDirectionPack.Tests.Runtime
 
             yield return null;
 
-            Assert.IsFalse(ch.GetComponent<Scripts.ThirdPersonController>().grounded);
+            Assert.IsFalse(ch.GetComponent<CharacterController>().grounded);
 
             Object.Destroy(ch);
             Object.Destroy(env);
@@ -83,7 +84,7 @@ namespace GravityDirectionPack.Tests.Runtime
 
             yield return null;
 
-            Assert.IsTrue(ch.GetComponent<Scripts.ThirdPersonController>().grounded);
+            Assert.IsTrue(ch.GetComponent<CharacterController>().grounded);
 
             Object.Destroy(ch);
             Object.Destroy(env);

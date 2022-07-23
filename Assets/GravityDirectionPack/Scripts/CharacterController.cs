@@ -6,6 +6,11 @@ namespace GravityDirectionPack.Scripts
     [ExecuteInEditMode]
     public class CharacterController : MonoBehaviour
     {
+        public LayerMask groundLayers;
+
+        [Header("State")] public bool grounded = true;
+        public float fallingSpeed = 0;
+
         private CapsuleCollider _collider;
         //private Vector3 lastMove = Vector3.zero;
 
@@ -27,6 +32,17 @@ namespace GravityDirectionPack.Scripts
 
         void Update()
         {
+            GroundedCheck();
+
+            if (grounded)
+            {
+                if (fallingSpeed > 0.1f)
+                    fallingSpeed = 0;
+            }
+            else
+            {
+                fallingSpeed += 0.8f;
+            }
             UpdateProperties();
         }
 
@@ -39,11 +55,25 @@ namespace GravityDirectionPack.Scripts
 #endif
         }
 
-        private void UpdateProperties()
+        private void GroundedCheck()
         {
-            radius = _collider.radius;
-            center = transform.position;
+            grounded = Physics.CheckSphere(
+                GetGroundedSphereLocation(),
+                GetGroundedSphereRadius(),
+                groundLayers,
+                QueryTriggerInteraction.Ignore);
         }
+
+        private Vector3 GetGroundedSphereLocation()
+        {
+            return transform.position + transform.rotation * Vector3.down * (-1 * GetGroundedSphereRadius());
+        }
+
+        private float GetGroundedSphereRadius()
+        {
+            return _collider.radius;
+        }
+
 
         public void Move(Vector3 movement)
         {
@@ -77,7 +107,13 @@ namespace GravityDirectionPack.Scripts
             return _collider.transform.position + _collider.transform.rotation * Vector3.down * (-1 * _collider.radius);
         }
 
-        public float radius; // { get; private set; }
-        public Vector3 center; // { get; private set; }
+        private void UpdateProperties()
+        {
+            radius = _collider.radius;
+            center = transform.position;
+        }
+
+        public float radius { get; private set; }
+        public Vector3 center { get; private set; }
     }
 }

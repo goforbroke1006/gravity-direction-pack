@@ -2065,8 +2065,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24e44624fa0f56942937ea62706cc642, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.25
-  center: {x: 0.63, y: 1.11, z: 1.18}
+  groundLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  grounded: 0
+  fallingSpeed: 11.200002
 --- !u!114 &3998458333483398780
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2079,13 +2082,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17bead187a5721d4fa683da9f59c9f1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundLayers:
-    serializedVersion: 2
-    m_Bits: 1
   LandingAudioClip: {fileID: 8300000, guid: a4cb35ccde466d643b0d9ec644e5eacc, type: 3}
   FootstepAudioVolume: 0.5
-  grounded: 1
-  fallingSpeed: 0
 --- !u!114 &2114533151
 MonoBehaviour:
   m_ObjectHideFlags: 0
