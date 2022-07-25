@@ -8,6 +8,8 @@ namespace GravityDirectionPack.Scripts
     /// </summary>
     public class GravityDirectionSystem : MonoBehaviour
     {
+        public float gravityAcceleration = 9.8f;
+
         private CharacterController[] _controllers;
 
         // Start is called before the first frame update
@@ -21,11 +23,19 @@ namespace GravityDirectionPack.Scripts
         {
             foreach (CharacterController controller in _controllers)
             {
-                //controller.fallingSpeed = 0.8f * Time.deltaTime;
+                if (!controller.grounded)
+                {
+                    controller.fallingSpeed += gravityAcceleration * Time.deltaTime;
+                }
+                else
+                {
+                    if (controller.fallingSpeed > 0.1f)
+                        controller.fallingSpeed = 0.0f;
+                }
 
-                Vector3 dir = Vector3.down; //getDirection(controller.gravityDirection);
-                Vector3 movement = dir * (controller.fallingSpeed * Time.deltaTime);
-                
+                Vector3 dir = Vector3.down;
+                Vector3 movement = dir * controller.fallingSpeed;
+
                 controller.Move(movement);
             }
         }

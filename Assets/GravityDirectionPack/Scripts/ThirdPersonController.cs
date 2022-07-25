@@ -49,9 +49,6 @@ namespace GravityDirectionPack.Scripts
             {
                 _controller = GetComponent<CharacterController>();
             }
-
-            // Gizmos.color = Color.magenta;
-            // Gizmos.DrawWireSphere(GetGroundedSphereLocation(), GetGroundedSphereRadius());
 #endif
         }
 
@@ -96,7 +93,8 @@ namespace GravityDirectionPack.Scripts
         private void Move()
         {
             Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
-            _controller.Move(inputDirection * (15.0f * Time.deltaTime));
+            float runningSpeed = 2.0f; // TODO: to component params
+            _controller.Move(inputDirection * (runningSpeed * Time.deltaTime));
 
             // update animator if using character
             if (_hasAnimator)
@@ -104,7 +102,5 @@ namespace GravityDirectionPack.Scripts
                 _animator.SetFloat(_animIDMotionSpeed, 1);
             }
         }
-
-        
     }
 }

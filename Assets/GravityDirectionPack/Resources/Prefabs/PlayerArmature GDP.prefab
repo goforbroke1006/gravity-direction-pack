@@ -2047,7 +2047,7 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7297057200213951021}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0.25
   m_Height: 1.8
@@ -2069,7 +2069,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   grounded: 0
-  fallingSpeed: 11.200002
+  fallingSpeed: 0
 --- !u!114 &3998458333483398780
 MonoBehaviour:
   m_ObjectHideFlags: 0
