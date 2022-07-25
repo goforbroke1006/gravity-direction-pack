@@ -144,10 +144,10 @@ namespace GravityDirectionPack.Scripts
                     else*/ 
                     if (distance < horizontalDirection.magnitude)
                     {
-                        // distance -= 0.1f; // add margin
-                        horizontalDirection *= distance; // makes short
-                        move.x = horizontalDirection.x;
-                        move.z = horizontalDirection.z;
+                        distance -= 0.05f; // add margin
+                        Vector3 final = horizontalDirection.normalized * distance; // makes short
+                        move.x = final.x;
+                        move.z = final.z;
                     }
                 }
             }

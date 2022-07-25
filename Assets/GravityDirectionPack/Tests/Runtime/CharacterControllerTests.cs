@@ -21,7 +21,7 @@ namespace GravityDirectionPack.Tests.Runtime
 
             GameObject cam = Object.Instantiate(SceneHelper.GetCamRes());
             cam.transform.position = new Vector3(-0.45988f, 1.375f, -2.869419f);
-            
+
             GameObject env = Object.Instantiate(SceneHelper.GetEnvRes());
             env.transform.position = Vector3.zero;
 
@@ -46,7 +46,7 @@ namespace GravityDirectionPack.Tests.Runtime
 
             GameObject cam = Object.Instantiate(SceneHelper.GetCamRes());
             cam.transform.position = new Vector3(-0.45988f, 1.375f, -2.869419f);
-            
+
             GameObject env = Object.Instantiate(SceneHelper.GetEnvRes());
             env.transform.position = Vector3.zero;
 
@@ -66,7 +66,7 @@ namespace GravityDirectionPack.Tests.Runtime
             SceneHelper.ClearScene();
             yield return null;
         }
-        
+
         [UnityTest]
         public IEnumerator IsGroundedWhenStayOnTheFloor()
         {
@@ -74,7 +74,7 @@ namespace GravityDirectionPack.Tests.Runtime
 
             GameObject cam = Object.Instantiate(SceneHelper.GetCamRes());
             cam.transform.position = new Vector3(-0.45988f, 1.375f, -2.869419f);
-            
+
             GameObject env = Object.Instantiate(SceneHelper.GetEnvRes());
             env.transform.position = Vector3.zero;
 
@@ -89,12 +89,12 @@ namespace GravityDirectionPack.Tests.Runtime
             SceneHelper.ClearScene();
             yield return null;
         }
-        
+
         [UnityTest]
         public IEnumerator IsNotGroundedWhenOverTheFloor()
         {
             SceneHelper.ClearScene();
-            
+
             GameObject cam = Object.Instantiate(SceneHelper.GetCamRes());
             cam.transform.position = new Vector3(-0.45988f, 5, -2.869419f);
 
@@ -111,12 +111,12 @@ namespace GravityDirectionPack.Tests.Runtime
             SceneHelper.ClearScene();
             yield return null;
         }
-        
+
         [UnityTest]
         public IEnumerator IsGroundedWhenStayOnTheRightWall()
         {
             SceneHelper.ClearScene();
-            
+
             GameObject cam = Object.Instantiate(SceneHelper.GetCamRes());
             cam.transform.position = new Vector3(1.52f, 1.375f, -8.46f);
 
@@ -135,7 +135,7 @@ namespace GravityDirectionPack.Tests.Runtime
             yield return null;
         }
     }
-    
+
     /// <summary>
     /// Check character movement with Move methods.
     /// Verify manual collision detecting works fine.
@@ -144,12 +144,12 @@ namespace GravityDirectionPack.Tests.Runtime
     public class CharacterControllerTests_Move
     {
         private const float MaxStuckInFloorDelta = 0.1f;
-        
+
         [UnityTest]
         public IEnumerator DontStuckInOtherColliderWhenFallingOnTheFloor()
         {
             SceneHelper.ClearScene();
-                
+
             GameObject cam = Object.Instantiate(SceneHelper.GetCamRes());
             cam.transform.position = new Vector3(1.52f, 1.375f, -8.46f);
 
@@ -171,12 +171,12 @@ namespace GravityDirectionPack.Tests.Runtime
             SceneHelper.ClearScene();
             yield return null;
         }
-        
+
         [UnityTest]
         public IEnumerator DontStuckInOtherColliderWhenFallingOnTheRightWall()
         {
             SceneHelper.ClearScene();
-            
+
             GameObject cam = Object.Instantiate(SceneHelper.GetCamRes());
             cam.transform.position = new Vector3(1.52f, 1.375f, -8.46f);
 
@@ -198,12 +198,12 @@ namespace GravityDirectionPack.Tests.Runtime
             SceneHelper.ClearScene();
             yield return null;
         }
-        
+
         [UnityTest]
         public IEnumerator IsNotMoveThroughRightWall()
         {
             SceneHelper.ClearScene();
-            
+
             GameObject cam = Object.Instantiate(SceneHelper.GetCamRes());
             cam.transform.position = new Vector3(1.52f, 1.375f, -8.46f);
 
@@ -218,9 +218,9 @@ namespace GravityDirectionPack.Tests.Runtime
             yield return null;
 
             // move right to wall
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 60 * 8; i++)
             {
-                characterController.Move(new Vector3(1, 0, -0.2f));
+                characterController.Move(new Vector3(0.01f, 0, -0.002f));
                 yield return null;
             }
 
