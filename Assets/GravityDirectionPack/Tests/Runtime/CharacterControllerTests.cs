@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
-using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Assert = NUnit.Framework.Assert;
 using CharacterController = GravityDirectionPack.Scripts.CharacterController;
 using Object = UnityEngine.Object;
 
@@ -199,9 +199,84 @@ namespace GravityDirectionPack.Tests.Runtime
             yield return null;
         }
 
+        private const float NormalCharMovementSpeed = 0.01f;
+
         [UnityTest]
-        public IEnumerator IsNotMoveThroughRightWall()
+        public IEnumerator IsNotMoveThroughWalls()
         {
+            object[][] dataRows = {
+                new object[]
+                {
+                    "Move face forward to front wall, collided perpendicularly",
+                    new Vector3(4, 0.0f, 1.18f),
+                    Quaternion.Euler(0, 0, 0),
+                    Vector3.forward,
+                },
+                new object[]
+                {
+                    "Move face forward to right wall, collided perpendicularly",
+                    new Vector3(4, 0.0f, 1.18f),
+                    Quaternion.Euler(0, 90, 0),
+                    Vector3.forward,
+                },
+                new object[]
+                {
+                    "Move right side forward to right wall, collided perpendicularly",
+                    new Vector3(4f, 0.0f, 1.18f),
+                    Quaternion.Euler(0, 0, 0),
+                    Vector3.right,
+                },
+                new object[]
+                {
+                    "Move front-right size forward to right wall, collided at an angle",
+                    new Vector3(4f, 0.0f, 1.18f),
+                    Quaternion.Euler(0, 0, 0),
+                    (Vector3.right + Vector3.forward).normalized,
+                },
+                new object[]
+                {
+                    "Move back-right size forward to right wall, collided at an angle",
+                    new Vector3(4f, 0.0f, 1.18f),
+                    Quaternion.Euler(0, 0, 0),
+                    (Vector3.right + Vector3.back).normalized,
+                },
+                new object[]
+                {
+                    "Move face forward to corner between walls, movement angle 45 degrees",
+                    new Vector3(2.5f, 0.0f, 2.5f),
+                    Quaternion.Euler(0, 45, 0),
+                    Vector3.forward,
+                },
+                new object[]
+                {
+                    "Move face forward to any wall, movement angle 17.875",
+                    new Vector3(2.5f, 0.0f, 2.5f),
+                    Quaternion.Euler(0, 17.875f, 0),
+                    Vector3.forward,
+                },
+                new object[]
+                {
+                    "Move face forward to any wall, movement angle 35.401",
+                    new Vector3(2.5f, 0.0f, 2.5f),
+                    Quaternion.Euler(0, 35.401f, 0),
+                    Vector3.forward,
+                },
+                new object[]
+                {
+                    "Move face forward to any wall, movement angle 53.989",
+                    new Vector3(2.5f, 0.0f, 2.5f),
+                    Quaternion.Euler(0, 53.989f, 0),
+                    Vector3.forward,
+                },
+                new object[]
+                {
+                    "Move face forward to any wall, movement angle 87.896",
+                    new Vector3(2.5f, 0.0f, 2.5f),
+                    Quaternion.Euler(0, 87.896f, 0),
+                    Vector3.forward,
+                },
+            };
+
             SceneHelper.ClearScene();
 
             GameObject cam = Object.Instantiate(SceneHelper.GetCamRes());
@@ -209,29 +284,44 @@ namespace GravityDirectionPack.Tests.Runtime
 
             GameObject env = Object.Instantiate(SceneHelper.GetEnvRes());
             env.transform.position = Vector3.zero;
+            
+            GameObject frontWall = GameObject.Find("Wall Forward");
+            GameObject rightWall = GameObject.Find("Wall Right");
 
-            GameObject ch = Object.Instantiate(SceneHelper.GetCharRes());
-            ch.transform.position = new Vector3(4.5f, 0.0f, 1.18f);
-            ch.transform.rotation = Quaternion.Euler(0, 0, 0);
-            CharacterController characterController = ch.GetComponent<CharacterController>();
-
-            yield return null;
-
-            // move right to wall
-            for (int i = 0; i < 60 * 8; i++)
+            foreach (object[] dataRow in dataRows)
             {
-                characterController.Move(new Vector3(0.01f, 0, -0.002f));
+                Debug.Log($"Test case '{dataRow[0]}'");
+
+                GameObject ch = Object.Instantiate(SceneHelper.GetCharRes());
+                ch.transform.position = (Vector3)dataRow[1];
+                ch.transform.rotation = (Quaternion)dataRow[2];
+                CharacterController characterController = ch.GetComponent<CharacterController>();
+
+                yield return null;
+
+                // move right to wall
+                Vector3 movement = (Vector3)dataRow[3] * NormalCharMovementSpeed;
+                const int frameRate = 60;
+                const int movementTimeInSeconds = 10;
+                for (int i = 0; i < frameRate * movementTimeInSeconds; i++)
+                {
+                    characterController.Move(movement);
+                    yield return null;
+                }
+
+                yield return null;
+                
+                float charMaxXWithRadiusPadding = ch.transform.position.x + characterController.radius;
+                float charMaxZWithRadiusPadding = ch.transform.position.z + characterController.radius;
+                
+                const float floatFault = 0.015f; // TODO: should assert without correction
+                
+                Assert.LessOrEqual(charMaxZWithRadiusPadding-floatFault, frontWall.transform.position.z);
+                Assert.LessOrEqual(charMaxXWithRadiusPadding-floatFault, rightWall.transform.position.x);
+
+                Object.Destroy(ch);
                 yield return null;
             }
-
-            yield return new WaitForSeconds(2);
-
-            GameObject rightWall = GameObject.Find("Wall Right");
-            float charWithRadiusPadding = ch.transform.position.x + characterController.radius;
-            Assert.IsTrue(charWithRadiusPadding <= rightWall.transform.position.y);
-
-            SceneHelper.ClearScene();
-            yield return null;
         }
     }
 }

@@ -98,8 +98,7 @@ namespace GravityDirectionPack.Scripts
             if (move.Equals(Vector3.zero))
                 return;
 
-            Debug.Log("move " + move);
-
+            movement = move;
 
             if (move.y < 0)
             {
@@ -116,68 +115,94 @@ namespace GravityDirectionPack.Scripts
                 }
             }
 
+            // movement in horizontal plane
             if (move.x != 0 || move.z != 0)
             {
-                // movement in horizontal plane
-
                 Vector3 horizontalDirection = new Vector3(move.x, 0, move.z);
 
-                Ray rayRight = new Ray(GetHorizontalRayInitPos(), GetHorizontalRayDirection());
-                float maxDistance = (horizontalDirection.magnitude >= 1.0f)
-                    ? horizontalDirection.magnitude
-                    : 1.0f;
+                // Ray rayRight = new Ray(GetHorizontalRayInitPos(), GetHorizontalRayDirection());
+                // if (Physics.Raycast(rayRight, out var hit, horizontalDirection.magnitude))
+                // {
+                //     if (hit.distance < horizontalDirection.magnitude)
+                //     {
+                //         if (Math.Abs(hit.distance - horizontalDirection.magnitude) < 0.05f)
+                //         {
+                //             move.x = 0;
+                //             move.z = 0;
+                //         }
+                //         else
+                //         {
+                //             Debug.Log("allowed " + hit.distance + " wanted " + horizontalDirection.magnitude);
+                //         
+                //             float correctedDistance = horizontalDirection.magnitude - hit.distance;
+                //             // distance -= 0.05f; // add margin
+                //             Vector3 final = horizontalDirection.normalized * correctedDistance; // makes short
+                //             move.x = final.x;
+                //             move.z = final.z;
+                //         }
+                //     }
+                // }
 
-                if (Physics.Raycast(rayRight, out var hit, maxDistance))
+                // correct movement if can be collision in next point
+                // draft solution - move on 5% of distance
+                // TODO: deal with collisions with binary search
+
+                float margin = 0.05f;
+                
+                bool collision = Physics.CheckCapsule(
+                    GetTopSphereCenter() + horizontalDirection.normalized * (horizontalDirection.magnitude + margin),
+                    GetBottomSphereCenter() + horizontalDirection.normalized * (horizontalDirection.magnitude + margin),
+                    _collider.radius,
+                    groundLayers,
+                    QueryTriggerInteraction.Ignore
+                );
+                if (collision)
                 {
-                    float distance = hit.distance;
+                    float nextTotalDistance = horizontalDirection.magnitude;
+                    float nextDistanceChanges = nextTotalDistance / 2;
 
-                    // if (distance < 0) distance = 0;
-                    /*float margin = 0.5f;
+                    const int maxAttemptsFindBestDistanceWithBinarySearch = 10;
+                    for (int i = 0; i < maxAttemptsFindBestDistanceWithBinarySearch; i++)
+                    {
+                        Vector3 nextPositionMovement = horizontalDirection.normalized * nextTotalDistance;
 
-                    if (distance < margin)
-                    {
-                        // distance -= margin;
-                        // horizontalDirection *= distance; // makes short
-                        move.x = 0;
-                        move.z = 0;
+                        collision = Physics.CheckCapsule(
+                            GetTopSphereCenter() + nextPositionMovement,
+                            GetBottomSphereCenter() + nextPositionMovement,
+                            _collider.radius
+                        );
+
+                        if (collision)
+                            nextTotalDistance -= nextDistanceChanges;
+                        else
+                            nextTotalDistance += nextDistanceChanges;
+
+                        nextDistanceChanges /= 2;
                     }
-                    else*/ 
-                    if (distance < horizontalDirection.magnitude)
-                    {
-                        distance -= 0.05f; // add margin
-                        Vector3 final = horizontalDirection.normalized * distance; // makes short
-                        move.x = final.x;
-                        move.z = final.z;
-                    }
+
+                    //Debug.Log($"want {horizontalDirection.magnitude} recommend {nextTotalDistance:00.0}");
+                    Vector3 final = horizontalDirection.normalized * nextTotalDistance; // makes short
+
+                    move.x = final.x;
+                    move.z = final.z;
                 }
             }
-
-            // correct movement if can be collision in next point
-            // draft solution - move on 5% of distance
-            // TODO: deal with collisions with binary search
-            // bool collision = Physics.CheckCapsule(
-            //     GetTopSphereCenter(),
-            //     GetBottomSphereCenter(),
-            //     _collider.radius
-            // );
-            // if (collision)
-            // {
-            //     move *= 0.1f;
-            // }
-
+            
             transform.Translate(move);
-            movement = move;
         }
 
         private Vector3 GetHorizontalRayInitPos()
         {
             Vector3 horizontalDirection = new Vector3(movement.x, 0, movement.z);
 
+            var tr = transform;
+            var rot = tr.rotation;
+
             // in middle of body
-            Vector3 rayInitPos = transform.position
-                                 + transform.rotation * Vector3.up * _collider.height / 2;
+            Vector3 rayInitPos = tr.position + rot * Vector3.up * _collider.height / 2;
+
             // move point outside capsule collider
-            rayInitPos += transform.rotation * horizontalDirection.normalized * _collider.radius;
+            rayInitPos += rot * horizontalDirection.normalized * _collider.radius;
 
             return rayInitPos;
         }
