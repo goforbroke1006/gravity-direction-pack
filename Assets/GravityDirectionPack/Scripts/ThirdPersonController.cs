@@ -94,7 +94,7 @@ namespace GravityDirectionPack.Scripts
         {
             Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
             float runningSpeed = 2.0f; // TODO: to component params
-            _controller.Move(inputDirection * (runningSpeed * Time.deltaTime));
+            _controller.Move(inputDirection * (runningSpeed * Time.deltaTime), Space.Self);
 
             // update animator if using character
             if (_hasAnimator)

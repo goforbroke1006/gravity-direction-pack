@@ -6,12 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.0.0] - 2022-07-30
+### Added
+- **GravityDirectionSystemTests::GravityAppliesToCharacterCorrectly** - 
+  test to verify falling in different directions.
+
+
 ## [v0.0.0] - 2022-07-29
 ### Changed 
 - Collision detection - try binary search for distance movement correction. 
   Better wall detection but character stops when should move along wall. Required an improvement.
 - Test case **CharacterControllerTests_Move::IsNotMoveThroughWalls** - 
   use manual data-rows to reproduce more cases of movement to walls.
+
 
 ## [v0.0.0] - 2022-07-24
 ### Added

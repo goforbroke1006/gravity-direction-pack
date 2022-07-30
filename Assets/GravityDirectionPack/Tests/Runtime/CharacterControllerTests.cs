@@ -305,7 +305,7 @@ namespace GravityDirectionPack.Tests.Runtime
                 const int movementTimeInSeconds = 10;
                 for (int i = 0; i < frameRate * movementTimeInSeconds; i++)
                 {
-                    characterController.Move(movement);
+                    characterController.Move(movement, Space.Self);
                     yield return null;
                 }
 

@@ -89,11 +89,14 @@ namespace GravityDirectionPack.Scripts
             return _collider.radius;
         }
 
+        public void Move(Vector3 move) => this.Move(move, Space.World);
+
         /// <summary>
         /// Move character relative to self
         /// </summary>
         /// <param name="move"></param>
-        public void Move(Vector3 move)
+        /// <param name="relativeTo"></param>
+        public void Move(Vector3 move, Space relativeTo)
         {
             if (move.Equals(Vector3.zero))
                 return;
@@ -188,7 +191,7 @@ namespace GravityDirectionPack.Scripts
                 }
             }
             
-            transform.Translate(move);
+            transform.Translate(move, relativeTo);
         }
 
         private Vector3 GetHorizontalRayInitPos()
