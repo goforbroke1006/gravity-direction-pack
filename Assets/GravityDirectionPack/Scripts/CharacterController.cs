@@ -16,7 +16,6 @@ namespace GravityDirectionPack.Scripts
         public Vector3 movement = Vector3.zero;
 
         private CapsuleCollider _collider;
-        //private Vector3 lastMove = Vector3.zero;
 
         // Start is called before the first frame update
         void Awake()
