@@ -23,8 +23,6 @@ namespace GravityDirectionPack.Scripts
         {
             foreach (GravityDirectionActor controller in _controllers)
             {
-                // if (controller == null) continue;
-                
                 if (!controller.grounded)
                 {
                     controller.fallingSpeed += gravityAcceleration * Time.deltaTime;
