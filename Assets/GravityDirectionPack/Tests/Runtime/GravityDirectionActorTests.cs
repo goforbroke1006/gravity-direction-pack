@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using GravityDirectionPack.Scripts;
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using Assert = NUnit.Framework.Assert;
 using Object = UnityEngine.Object;
 
 namespace GravityDirectionPack.Tests.Runtime
@@ -143,6 +143,14 @@ namespace GravityDirectionPack.Tests.Runtime
     // ReSharper disable once InconsistentNaming
     public class GravityDirectionActorTests_Move
     {
+        private class ActorTestCache
+        {
+            public string Name;
+            public Vector3 CharacterPosition;
+            public Quaternion CharacterRotation;
+            public Vector3 CharMoveDir;
+        }
+
         private const float MaxStuckInFloorDelta = 0.1f;
 
         [UnityTest]
@@ -301,7 +309,7 @@ namespace GravityDirectionPack.Tests.Runtime
                 chTransform.position = (Vector3)dataRow[1];
                 chTransform.rotation = (Quaternion)dataRow[2];
                 gravityDirectionActor.fallingSpeed = 0;
-                gravityDirectionActor.movement = Vector3.zero;
+                gravityDirectionActor.Move(Vector3.zero);
                 yield return null; // update frames
 
                 // move right to wall
@@ -323,7 +331,67 @@ namespace GravityDirectionPack.Tests.Runtime
 
                 Assert.LessOrEqual(charMaxZWithRadiusPadding - floatFault, frontWall.transform.position.z);
                 Assert.LessOrEqual(charMaxXWithRadiusPadding - floatFault, rightWall.transform.position.x);
-                
+
+                yield return null; // update frames
+            }
+
+            Object.Destroy(ch);
+        }
+
+        [UnityTest]
+        public IEnumerator CanMoveSmoothlyAlongTheWall_ReachTheCorner()
+        {
+            const int frameRate = 60;
+            const int movementTimeInSeconds = 10;
+
+            ActorTestCache[] dataRows =
+            {
+                new()
+                {
+                    Name = "Move face forward to corner between walls, movement angle 45 degrees",
+                    CharacterPosition = new Vector3(-2.0f, 0.0f, 2.0f),
+                    CharacterRotation = Quaternion.Euler(0, 45, 0),
+                    CharMoveDir = Vector3.forward,
+                },
+            };
+
+            SceneHelper.ClearScene();
+
+            GameObject cam = Object.Instantiate(SceneHelper.GetCamRes());
+            cam.transform.position = new Vector3(1.52f, 1.375f, -8.46f);
+
+            GameObject env = Object.Instantiate(SceneHelper.GetEnvRes());
+            env.transform.position = Vector3.zero;
+
+            var ch = Object.Instantiate(SceneHelper.GetCharRes());
+            var chTransform = ch.transform;
+            var gravityDirectionActor = ch.GetComponent<GravityDirectionActor>();
+
+            foreach (var dataRow in dataRows)
+            {
+                Debug.Log($"Test case '{dataRow.Name}'");
+
+                // reset character
+                chTransform.position = dataRow.CharacterPosition;
+                chTransform.rotation = dataRow.CharacterRotation;
+                gravityDirectionActor.fallingSpeed = 0;
+                gravityDirectionActor.Move(Vector3.zero);
+                yield return null; // update frames
+
+                // move right to wall
+                Vector3 movement = dataRow.CharMoveDir * NormalCharMovementSpeed;
+
+                for (int i = 0; i < frameRate * movementTimeInSeconds; i++)
+                {
+                    gravityDirectionActor.Move(movement);
+                    yield return null; // update frames
+                }
+
+                yield return null; // update frames
+
+                Assert.GreaterOrEqual(ch.transform.position.x, 4.5f);
+                Assert.GreaterOrEqual(ch.transform.position.z, 4.5f);
+
                 yield return null; // update frames
             }
 

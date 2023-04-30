@@ -64,7 +64,7 @@ namespace GravityDirectionPack.Tests.Runtime
                 chTransform.position = (Vector3)dataRow[1];
                 chTransform.rotation = (Quaternion)dataRow[2];
                 gravityDirectionActor.fallingSpeed = 0;
-                gravityDirectionActor.movement = Vector3.zero;
+                gravityDirectionActor.Move(Vector3.zero);
                 yield return null; // update frames
 
                 gdsComponent.ReloadControllersList();

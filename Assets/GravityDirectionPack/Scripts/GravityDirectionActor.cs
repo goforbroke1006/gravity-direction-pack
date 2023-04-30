@@ -11,7 +11,7 @@ namespace GravityDirectionPack.Scripts
 
         [Header("State")] public bool grounded = true;
         public float fallingSpeed = 0;
-        public Vector3 movement = Vector3.zero;
+        public Vector3 Movement { get; private set; }
 
         private CapsuleCollider _collider;
 
@@ -93,10 +93,10 @@ namespace GravityDirectionPack.Scripts
         /// <param name="relativeTo"></param>
         public void Move(Vector3 move, Space relativeTo = Space.Self)
         {
-            if (move.Equals(Vector3.zero))
-                return;
+            Movement = move;
 
-            movement = move;
+            if (move.Equals(Vector3.zero) && relativeTo == Space.Self)
+                return;
 
             if (move.y < 0)
             {
@@ -192,7 +192,7 @@ namespace GravityDirectionPack.Scripts
 
         private Vector3 GetHorizontalRayInitPos()
         {
-            Vector3 horizontalDirection = new Vector3(movement.x, 0, movement.z);
+            Vector3 horizontalDirection = new Vector3(Movement.x, 0, Movement.z);
 
             var tr = transform;
             var rot = tr.rotation;
@@ -208,7 +208,7 @@ namespace GravityDirectionPack.Scripts
 
         private Vector3 GetHorizontalRayDirection()
         {
-            Vector3 horizontalDirection = new Vector3(movement.x, 0, movement.z);
+            Vector3 horizontalDirection = new Vector3(Movement.x, 0, Movement.z);
 
             return transform.rotation * horizontalDirection;
         }
