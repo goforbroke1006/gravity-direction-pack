@@ -8,7 +8,6 @@ jobs:
 
       - uses: actions/cache@v2
         with:
-#          path: /home/runner/work/gravity-direction-pack/gravity-direction-pack/Library
           path: ./Library
           key: Library-gravity-direction-pack-TargetPlatform_ANY
           restore-keys: |

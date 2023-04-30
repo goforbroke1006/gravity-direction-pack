@@ -1,13 +1,11 @@
 using System;
-using System.Numerics;
 using UnityEngine;
-using Vector3 = UnityEngine.Vector3;
 
 namespace GravityDirectionPack.Scripts
 {
     [RequireComponent(typeof(CapsuleCollider))]
     [ExecuteInEditMode]
-    public class CharacterController : MonoBehaviour
+    public class GravityDirectionActor : MonoBehaviour
     {
         public LayerMask groundLayers;
 
@@ -18,7 +16,7 @@ namespace GravityDirectionPack.Scripts
         private CapsuleCollider _collider;
 
         // Start is called before the first frame update
-        void Awake()
+        private void Awake()
         {
             _collider = GetComponent<CapsuleCollider>();
             if (!_collider.isTrigger)
@@ -31,7 +29,7 @@ namespace GravityDirectionPack.Scripts
         }
 
         // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
             _collider = GetComponent<CapsuleCollider>();
             UpdateProperties();
@@ -39,7 +37,7 @@ namespace GravityDirectionPack.Scripts
 
         // Update is called once per frame
 
-        void Update()
+        private void Update()
         {
             GroundedCheck();
             UpdateProperties();
@@ -77,7 +75,7 @@ namespace GravityDirectionPack.Scripts
         private Vector3 GetGroundedSphereLocation() // TODO: add tests
         {
             var tr = transform;
-            Vector3 pos = Vector3.up; // sphere over lowest char point
+            var pos = Vector3.up; // sphere over lowest char point
             pos -= new Vector3(0, 0.05f, 0); // a little bit lower than char to detect grounding event
             pos *= GetGroundedSphereRadius(); // sphere higher on radius distance
             return tr.position + tr.rotation * pos;
@@ -88,14 +86,12 @@ namespace GravityDirectionPack.Scripts
             return _collider.radius;
         }
 
-        public void Move(Vector3 move) => this.Move(move, Space.World);
-
         /// <summary>
-        /// Move character relative to self
+        /// Move character relative to ...
         /// </summary>
         /// <param name="move"></param>
         /// <param name="relativeTo"></param>
-        public void Move(Vector3 move, Space relativeTo)
+        public void Move(Vector3 move, Space relativeTo = Space.Self)
         {
             if (move.Equals(Vector3.zero))
                 return;
@@ -110,7 +106,8 @@ namespace GravityDirectionPack.Scripts
                 // calculate distance between lowest capsule point
                 // and potential collision point
                 // and correct movement to bottom (along Y axis)
-                Ray rayUnder = new Ray(transform.position, transform.rotation * Vector3.down);
+                var tr = transform;
+                Ray rayUnder = new Ray(tr.position, tr.rotation * Vector3.down);
                 if (Physics.Raycast(rayUnder, out var hit, Math.Abs(move.y)))
                 {
                     move.y = -1 * hit.distance;
@@ -150,7 +147,7 @@ namespace GravityDirectionPack.Scripts
                 // TODO: deal with collisions with binary search
 
                 float margin = 0.05f;
-                
+
                 bool collision = Physics.CheckCapsule(
                     GetTopSphereCenter() + horizontalDirection.normalized * (horizontalDirection.magnitude + margin),
                     GetBottomSphereCenter() + horizontalDirection.normalized * (horizontalDirection.magnitude + margin),
@@ -189,7 +186,7 @@ namespace GravityDirectionPack.Scripts
                     move.z = final.z;
                 }
             }
-            
+
             transform.Translate(move, relativeTo);
         }
 

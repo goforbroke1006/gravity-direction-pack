@@ -6,14 +6,14 @@ namespace GravityDirectionPack.Scripts
     /// <summary>
     /// Third person controller with movement, jumping and animation
     /// </summary>
-    [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(GravityDirectionActor))]
     [RequireComponent(typeof(InputsReader))]
     public class ThirdPersonController : MonoBehaviour
     {
         public AudioClip LandingAudioClip;
         [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
 
-        private CharacterController _controller;
+        private GravityDirectionActor _controller;
         private Animator _animator;
         private bool _hasAnimator;
         private InputsReader _input;
@@ -26,7 +26,7 @@ namespace GravityDirectionPack.Scripts
         // Start is called before the first frame update
         private void Start()
         {
-            _controller = GetComponent<CharacterController>();
+            _controller = GetComponent<GravityDirectionActor>();
             _hasAnimator = TryGetComponent(out _animator);
             _input = GetComponent<InputsReader>();
 
@@ -47,7 +47,7 @@ namespace GravityDirectionPack.Scripts
 #if UNITY_EDITOR
             if (_controller == null)
             {
-                _controller = GetComponent<CharacterController>();
+                _controller = GetComponent<GravityDirectionActor>();
             }
 #endif
         }
@@ -94,7 +94,7 @@ namespace GravityDirectionPack.Scripts
         {
             Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
             float runningSpeed = 2.0f; // TODO: to component params
-            _controller.Move(inputDirection * (runningSpeed * Time.deltaTime), Space.Self);
+            _controller.Move(inputDirection * (runningSpeed * Time.deltaTime));
 
             // update animator if using character
             if (_hasAnimator)

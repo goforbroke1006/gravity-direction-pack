@@ -10,7 +10,7 @@ namespace GravityDirectionPack.Scripts
     {
         public float gravityAcceleration = 9.8f;
 
-        private CharacterController[] _controllers;
+        private GravityDirectionActor[] _controllers;
 
         // Start is called before the first frame update
         private void Start()
@@ -21,8 +21,10 @@ namespace GravityDirectionPack.Scripts
         // Update is called once per frame
         private void Update()
         {
-            foreach (CharacterController controller in _controllers)
+            foreach (GravityDirectionActor controller in _controllers)
             {
+                // if (controller == null) continue;
+                
                 if (!controller.grounded)
                 {
                     controller.fallingSpeed += gravityAcceleration * Time.deltaTime;
@@ -36,13 +38,13 @@ namespace GravityDirectionPack.Scripts
                 Vector3 dir = Vector3.down;
                 Vector3 movement = dir * controller.fallingSpeed;
 
-                controller.Move(movement, Space.Self);
+                controller.Move(movement);
             }
         }
 
         public void ReloadControllersList()
         {
-            _controllers = GameObject.FindObjectsOfType<CharacterController>();
+            _controllers = GameObject.FindObjectsOfType<GravityDirectionActor>();
         }
     }
 }

@@ -26,7 +26,7 @@ namespace GravityDirectionPack.Tests.Runtime
                 new object[]
                 {
                     "Falling to right, increase along X",
-                    new Vector3(-15.91f, 6.52f, -0.534f),
+                    new Vector3(-50.91f, 6.52f, -0.534f),
                     Quaternion.Euler(-90, 0, 90),
                     MyAssert.PositionChangedAxis.X,
                     MyAssert.PositionChangedValueDir.Increase,
@@ -52,14 +52,19 @@ namespace GravityDirectionPack.Tests.Runtime
             gdsObj.transform.position = Vector3.zero;
             GravityDirectionSystem gdsComponent = gdsObj.GetComponent<GravityDirectionSystem>();
 
+            GameObject ch = Object.Instantiate(SceneHelper.GetCharRes());
+            var chTransform = ch.transform;
+            GravityDirectionActor gravityDirectionActor = ch.GetComponent<GravityDirectionActor>();
+
             foreach (object[] dataRow in dataRows)
             {
                 Debug.Log($"Test case '{dataRow[0]}'");
 
-                GameObject ch = Object.Instantiate(SceneHelper.GetCharRes());
-                ch.transform.position = (Vector3)dataRow[1];
-                ch.transform.rotation = (Quaternion)dataRow[2];
-                Camera.main.transform.LookAt(ch.transform.position);
+                // reset character
+                chTransform.position = (Vector3)dataRow[1];
+                chTransform.rotation = (Quaternion)dataRow[2];
+                gravityDirectionActor.fallingSpeed = 0;
+                gravityDirectionActor.movement = Vector3.zero;
                 yield return null; // update frames
 
                 gdsComponent.ReloadControllersList();
@@ -68,7 +73,7 @@ namespace GravityDirectionPack.Tests.Runtime
                 for (int i = 0; i < 5; i++)
                 {
                     yield return null; // update frames
-                    Camera.main.transform.LookAt(ch.transform.position);
+                    camObj.transform.LookAt(ch.transform.position);
                     Thread.Sleep(200);
 
                     var currPos = ch.transform.position;
@@ -82,33 +87,13 @@ namespace GravityDirectionPack.Tests.Runtime
                     prevPos = currPos;
                 }
 
-                Object.Destroy(ch);
-
-                yield return null;
+                yield return null; // update frames
             }
+
+            Object.Destroy(ch);
 
             SceneHelper.ClearScene();
             yield return null;
-        }
-
-        private static GameObject GetEnvRes()
-        {
-            return Resources.Load<GameObject>("Prefabs/Environment");
-        }
-
-        private static GameObject GetCamRes()
-        {
-            return Resources.Load<GameObject>("Prefabs/MainCamera");
-        }
-
-        private static GameObject GetGDSRes()
-        {
-            return Resources.Load<GameObject>("Prefabs/GravityDirectionSystem");
-        }
-
-        private static GameObject GetCharRes()
-        {
-            return Resources.Load<GameObject>("Prefabs/PlayerArmature GDP");
         }
     }
 }
