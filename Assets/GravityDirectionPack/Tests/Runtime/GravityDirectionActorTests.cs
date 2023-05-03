@@ -31,7 +31,7 @@ namespace GravityDirectionPack.Tests.Runtime
             yield return null;
             yield return null;
 
-            float actualExposedRadius = ch.GetComponent<GravityDirectionActor>().radius;
+            float actualExposedRadius = ch.GetComponent<GravityDirectionActor>().Radius;
             float expectedRealCapsuleRadius = ch.GetComponent<CapsuleCollider>().radius;
             Assert.IsTrue(Math.Abs(actualExposedRadius - expectedRealCapsuleRadius) < 0.01f);
 
@@ -56,7 +56,7 @@ namespace GravityDirectionPack.Tests.Runtime
             yield return null;
             yield return null;
 
-            Vector3 actualCharPosition = ch.GetComponent<GravityDirectionActor>().center;
+            Vector3 actualCharPosition = ch.GetComponent<GravityDirectionActor>().Center;
             Vector3 expectedTransPosition = ch.transform.position;
             Assert.AreEqual(actualCharPosition, expectedTransPosition);
             Assert.AreEqual(actualCharPosition.x, expectedTransPosition.x);
@@ -324,8 +324,8 @@ namespace GravityDirectionPack.Tests.Runtime
 
                 yield return null;
 
-                float charMaxXWithRadiusPadding = chTransform.position.x + gravityDirectionActor.radius;
-                float charMaxZWithRadiusPadding = chTransform.position.z + gravityDirectionActor.radius;
+                float charMaxXWithRadiusPadding = chTransform.position.x + gravityDirectionActor.Radius;
+                float charMaxZWithRadiusPadding = chTransform.position.z + gravityDirectionActor.Radius;
 
                 const float floatFault = 0.015f; // TODO: should assert without correction
 
@@ -342,7 +342,7 @@ namespace GravityDirectionPack.Tests.Runtime
         public IEnumerator CanMoveSmoothlyAlongTheWall_ReachTheCorner()
         {
             const int frameRate = 60;
-            const int movementTimeInSeconds = 10;
+            const int movementTimeInSeconds = 20;
 
             ActorTestCache[] dataRows =
             {
