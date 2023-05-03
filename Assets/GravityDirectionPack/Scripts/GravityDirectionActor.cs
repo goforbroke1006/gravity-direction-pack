@@ -10,8 +10,8 @@ namespace GravityDirectionPack.Scripts
         public LayerMask groundLayers;
 
         [Header("State")] public bool grounded = true;
-        public float fallingSpeed = 0;
-        public Vector3 movement = Vector3.zero;
+        public float fallingSpeed;
+        public Vector3 Movement { get; private set; }
 
         private CapsuleCollider _collider;
 
@@ -21,8 +21,8 @@ namespace GravityDirectionPack.Scripts
             _collider = GetComponent<CapsuleCollider>();
             if (!_collider.isTrigger)
             {
-                Debug.Log("auto enable _collider.isTrigger");
-                _collider.isTrigger = true;
+                // Debug.Log("auto enable _collider.isTrigger");
+                // _collider.isTrigger = true;
             }
 
             UpdateProperties();
@@ -36,7 +36,6 @@ namespace GravityDirectionPack.Scripts
         }
 
         // Update is called once per frame
-
         private void Update()
         {
             GroundedCheck();
@@ -52,15 +51,7 @@ namespace GravityDirectionPack.Scripts
 
             Gizmos.color = Color.cyan;
             Gizmos.DrawWireSphere(GetGroundedSphereLocation(), GetGroundedSphereRadius());
-
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(GetHorizontalRayInitPos() + GetHorizontalRayDirection(), 0.1f);
 #endif
-        }
-
-        private void OnTriggerStay(Collider other)
-        {
-            Debug.Log(other.bounds.center);
         }
 
         private void GroundedCheck()
@@ -86,6 +77,12 @@ namespace GravityDirectionPack.Scripts
             return _collider.radius;
         }
 
+        private const float HorHitMargin = 0.05f;
+        private Vector3 _horDirFinal = Vector3.zero;
+        private Vector3 _horHitDirection;
+        private float _horHitDistance;
+        private readonly Collider[] _horHitColliders = new Collider[5];
+
         /// <summary>
         /// Move character relative to ...
         /// </summary>
@@ -93,10 +90,10 @@ namespace GravityDirectionPack.Scripts
         /// <param name="relativeTo"></param>
         public void Move(Vector3 move, Space relativeTo = Space.Self)
         {
-            if (move.Equals(Vector3.zero))
-                return;
+            Movement = move;
 
-            movement = move;
+            if (move.Equals(Vector3.zero) && relativeTo == Space.Self)
+                return;
 
             if (move.y < 0)
             {
@@ -117,107 +114,46 @@ namespace GravityDirectionPack.Scripts
             // movement in horizontal plane
             if (move.x != 0 || move.z != 0)
             {
-                Vector3 horizontalDirection = new Vector3(move.x, 0, move.z);
+                _horDirFinal.x = move.x;
+                _horDirFinal.z = move.z;
 
-                // Ray rayRight = new Ray(GetHorizontalRayInitPos(), GetHorizontalRayDirection());
-                // if (Physics.Raycast(rayRight, out var hit, horizontalDirection.magnitude))
-                // {
-                //     if (hit.distance < horizontalDirection.magnitude)
-                //     {
-                //         if (Math.Abs(hit.distance - horizontalDirection.magnitude) < 0.05f)
-                //         {
-                //             move.x = 0;
-                //             move.z = 0;
-                //         }
-                //         else
-                //         {
-                //             Debug.Log("allowed " + hit.distance + " wanted " + horizontalDirection.magnitude);
-                //         
-                //             float correctedDistance = horizontalDirection.magnitude - hit.distance;
-                //             // distance -= 0.05f; // add margin
-                //             Vector3 final = horizontalDirection.normalized * correctedDistance; // makes short
-                //             move.x = final.x;
-                //             move.z = final.z;
-                //         }
-                //     }
-                // }
-
-                // correct movement if can be collision in next point
-                // draft solution - move on 5% of distance
-                // TODO: deal with collisions with binary search
-
-                float margin = 0.05f;
-
-                bool collision = Physics.CheckCapsule(
-                    GetTopSphereCenter() + horizontalDirection.normalized * (horizontalDirection.magnitude + margin),
-                    GetBottomSphereCenter() + horizontalDirection.normalized * (horizontalDirection.magnitude + margin),
+                int numHit = Physics.OverlapCapsuleNonAlloc(
+                    GetTopSphereCenter() + _horDirFinal.normalized * (_horDirFinal.magnitude + HorHitMargin),
+                    GetBottomSphereCenter() + _horDirFinal.normalized * (_horDirFinal.magnitude + HorHitMargin),
                     _collider.radius,
+                    _horHitColliders,
                     groundLayers,
-                    QueryTriggerInteraction.Ignore
-                );
-                if (collision)
+                    QueryTriggerInteraction.Ignore);
+
+                var thisTr = transform;
+
+                for (int i = 0; i < numHit; i++)
                 {
-                    float nextTotalDistance = horizontalDirection.magnitude;
-                    float nextDistanceChanges = nextTotalDistance / 2;
+                    var other = _horHitColliders[i];
+                    var otherTr = other.transform;
 
-                    const int maxAttemptsFindBestDistanceWithBinarySearch = 10;
-                    for (int i = 0; i < maxAttemptsFindBestDistanceWithBinarySearch; i++)
+                    bool hasPenetration = Physics.ComputePenetration(
+                        _collider, thisTr.position, thisTr.rotation,
+                        other, otherTr.position, otherTr.rotation,
+                        out _horHitDirection, out _horHitDistance);
+
+                    if (hasPenetration)
                     {
-                        Vector3 nextPositionMovement = horizontalDirection.normalized * nextTotalDistance;
-
-                        collision = Physics.CheckCapsule(
-                            GetTopSphereCenter() + nextPositionMovement,
-                            GetBottomSphereCenter() + nextPositionMovement,
-                            _collider.radius
-                        );
-
-                        if (collision)
-                            nextTotalDistance -= nextDistanceChanges;
-                        else
-                            nextTotalDistance += nextDistanceChanges;
-
-                        nextDistanceChanges /= 2;
+                        _horDirFinal += transform.InverseTransformDirection(_horHitDirection * _horHitDistance);
                     }
-
-                    //Debug.Log($"want {horizontalDirection.magnitude} recommend {nextTotalDistance:00.0}");
-                    Vector3 final = horizontalDirection.normalized * nextTotalDistance; // makes short
-
-                    move.x = final.x;
-                    move.z = final.z;
                 }
+
+                move.x = _horDirFinal.x;
+                move.z = _horDirFinal.z;
             }
 
             transform.Translate(move, relativeTo);
         }
 
-        private Vector3 GetHorizontalRayInitPos()
-        {
-            Vector3 horizontalDirection = new Vector3(movement.x, 0, movement.z);
-
-            var tr = transform;
-            var rot = tr.rotation;
-
-            // in middle of body
-            Vector3 rayInitPos = tr.position + rot * Vector3.up * _collider.height / 2;
-
-            // move point outside capsule collider
-            rayInitPos += rot * horizontalDirection.normalized * _collider.radius;
-
-            return rayInitPos;
-        }
-
-        private Vector3 GetHorizontalRayDirection()
-        {
-            Vector3 horizontalDirection = new Vector3(movement.x, 0, movement.z);
-
-            return transform.rotation * horizontalDirection;
-        }
-
         private Vector3 GetTopSphereCenter()
         {
             var tr = _collider.transform;
-            return tr.position
-                   + tr.rotation * Vector3.up * (_collider.height - _collider.radius);
+            return tr.position + tr.rotation * Vector3.up * (_collider.height - _collider.radius);
         }
 
         private Vector3 GetBottomSphereCenter()
@@ -229,11 +165,11 @@ namespace GravityDirectionPack.Scripts
 
         private void UpdateProperties()
         {
-            radius = _collider.radius;
-            center = transform.position;
+            Radius = _collider.radius;
+            Center = transform.position;
         }
 
-        public float radius { get; private set; }
-        public Vector3 center { get; private set; }
+        public float Radius { get; private set; }
+        public Vector3 Center { get; private set; }
     }
 }

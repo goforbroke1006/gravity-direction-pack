@@ -18,6 +18,11 @@ namespace GravityDirectionPack.Scripts
         {
             MoveInput(value.Get<Vector2>());
         }
+
+        private void Jump()
+        {
+            Debug.Log("jump");
+        }
 #endif
 
         public void MoveInput(Vector2 newMoveDirection)

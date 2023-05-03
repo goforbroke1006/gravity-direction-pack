@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace GravityDirectionPack.Scripts
 {
@@ -36,8 +35,6 @@ namespace GravityDirectionPack.Scripts
         // Update is called once per frame
         private void Update()
         {
-            //_hasAnimator = TryGetComponent(out _animator);
-
             JumpAndGravity();
             Move();
         }
@@ -56,7 +53,7 @@ namespace GravityDirectionPack.Scripts
         {
             if (animationEvent.animatorClipInfo.weight > 0.5f)
             {
-                AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center),
+                AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.Center),
                     FootstepAudioVolume);
             }
         }

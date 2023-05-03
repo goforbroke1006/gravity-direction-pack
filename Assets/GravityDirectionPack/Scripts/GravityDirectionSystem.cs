@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace GravityDirectionPack.Scripts
@@ -42,7 +41,7 @@ namespace GravityDirectionPack.Scripts
 
         public void ReloadControllersList()
         {
-            _controllers = GameObject.FindObjectsOfType<GravityDirectionActor>();
+            _controllers = FindObjectsOfType<GravityDirectionActor>();
         }
     }
 }
