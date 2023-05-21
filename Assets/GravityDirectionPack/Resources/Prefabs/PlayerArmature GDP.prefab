@@ -1991,9 +1991,9 @@ GameObject:
   - component: {fileID: 4102681011743621869}
   - component: {fileID: 8731907438059444448}
   - component: {fileID: 4112380252464507542}
-  - component: {fileID: 3998458333483398780}
   - component: {fileID: 2114533151}
   - component: {fileID: 2114533150}
+  - component: {fileID: 3998458333483398780}
   m_Layer: 8
   m_Name: PlayerArmature GDP
   m_TagString: Player
@@ -2009,7 +2009,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7297057200213951021}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.711, y: 0, z: 1.1305809}
+  m_LocalPosition: {x: -1.711, y: 5.03, z: 1.1305809}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2021,7 +2021,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &4102681011743621869
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2038,7 +2038,8 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!136 &8731907438059444448
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2070,20 +2071,6 @@ MonoBehaviour:
     m_Bits: 1
   grounded: 0
   fallingSpeed: 0
---- !u!114 &3998458333483398780
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7297057200213951021}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 17bead187a5721d4fa683da9f59c9f1f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  LandingAudioClip: {fileID: 8300000, guid: a4cb35ccde466d643b0d9ec644e5eacc, type: 3}
-  FootstepAudioVolume: 0.5
 --- !u!114 &2114533151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2127,6 +2114,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   move: {x: 0, y: 0}
+  look: {x: 0, y: 0}
+  jump: 0
+  sprint: 0
+  analogMovement: 0
+  cursorLocked: 1
+  cursorInputForLook: 1
+--- !u!114 &3998458333483398780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7297057200213951021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17bead187a5721d4fa683da9f59c9f1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MoveSpeed: 2
+  SprintSpeed: 5.335
+  RotationSmoothTime: 0.12
+  SpeedChangeRate: 10
+  LandingAudioClip: {fileID: 8300000, guid: a4cb35ccde466d643b0d9ec644e5eacc, type: 3}
+  FootstepAudioClips:
+  - {fileID: 8300000, guid: 72f526a6a9890f643a88e85a61c86c8a, type: 3}
+  FootstepAudioVolume: 0.5
 --- !u!1 &7407615755145786993
 GameObject:
   m_ObjectHideFlags: 0

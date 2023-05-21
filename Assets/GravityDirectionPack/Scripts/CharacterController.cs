@@ -3,15 +3,20 @@ using UnityEngine;
 
 namespace GravityDirectionPack.Scripts
 {
+    /// <summary>
+    /// CharacterController allow move character in specified direction.
+    /// Can be applied to:
+    ///   - player character (be controlled with player input)
+    ///   - NPC
+    /// </summary>
     [RequireComponent(typeof(CapsuleCollider))]
     [ExecuteInEditMode]
-    public class GravityDirectionActor : MonoBehaviour
+    public class CharacterController : MonoBehaviour
     {
         public LayerMask groundLayers;
 
         [Header("State")] public bool grounded = true;
         public float fallingSpeed;
-        public Vector3 Movement { get; private set; }
 
         private CapsuleCollider _collider;
 
@@ -21,25 +26,21 @@ namespace GravityDirectionPack.Scripts
             _collider = GetComponent<CapsuleCollider>();
             if (!_collider.isTrigger)
             {
-                // Debug.Log("auto enable _collider.isTrigger");
-                // _collider.isTrigger = true;
+                Debug.Log("auto enable _collider.isTrigger");
+                _collider.isTrigger = true;
             }
-
-            UpdateProperties();
         }
 
         // Start is called before the first frame update
         private void Start()
         {
             _collider = GetComponent<CapsuleCollider>();
-            UpdateProperties();
         }
 
         // Update is called once per frame
         private void Update()
         {
             GroundedCheck();
-            UpdateProperties();
         }
 
         private void OnDrawGizmosSelected()
@@ -86,16 +87,16 @@ namespace GravityDirectionPack.Scripts
         /// <summary>
         /// Move character relative to ...
         /// </summary>
-        /// <param name="move"></param>
+        /// <param name="motion"></param>
         /// <param name="relativeTo"></param>
-        public void Move(Vector3 move, Space relativeTo = Space.Self)
+        public void Move(Vector3 motion, Space relativeTo = Space.World)
         {
-            Movement = move;
+            this.velocity = motion;
 
-            if (move.Equals(Vector3.zero) && relativeTo == Space.Self)
+            if (motion == Vector3.zero)
                 return;
 
-            if (move.y < 0)
+            if (motion.y < 0)
             {
                 // movement down
                 // try to check with raycast
@@ -105,17 +106,17 @@ namespace GravityDirectionPack.Scripts
                 // and correct movement to bottom (along Y axis)
                 var tr = transform;
                 Ray rayUnder = new Ray(tr.position, tr.rotation * Vector3.down);
-                if (Physics.Raycast(rayUnder, out var hit, Math.Abs(move.y)))
+                if (Physics.Raycast(rayUnder, out var hit, Math.Abs(motion.y)))
                 {
-                    move.y = -1 * hit.distance;
+                    motion.y = -1 * hit.distance;
                 }
             }
 
             // movement in horizontal plane
-            if (move.x != 0 || move.z != 0)
+            if (motion.x != 0 || motion.z != 0)
             {
-                _horDirFinal.x = move.x;
-                _horDirFinal.z = move.z;
+                _horDirFinal.x = motion.x;
+                _horDirFinal.z = motion.z;
 
                 int numHit = Physics.OverlapCapsuleNonAlloc(
                     GetTopSphereCenter() + _horDirFinal.normalized * (_horDirFinal.magnitude + HorHitMargin),
@@ -139,15 +140,22 @@ namespace GravityDirectionPack.Scripts
 
                     if (hasPenetration)
                     {
-                        _horDirFinal += transform.InverseTransformDirection(_horHitDirection * _horHitDistance);
+                        if (relativeTo == Space.Self)
+                        {
+                            _horDirFinal += transform.InverseTransformDirection(_horHitDirection * _horHitDistance);
+                        }
+                        else
+                        {
+                            _horDirFinal += _horHitDirection * _horHitDistance;
+                        }
                     }
                 }
 
-                move.x = _horDirFinal.x;
-                move.z = _horDirFinal.z;
+                motion.x = _horDirFinal.x;
+                motion.z = _horDirFinal.z;
             }
 
-            transform.Translate(move, relativeTo);
+            transform.Translate(motion, relativeTo);
         }
 
         private Vector3 GetTopSphereCenter()
@@ -163,13 +171,19 @@ namespace GravityDirectionPack.Scripts
                    + tr.rotation * Vector3.down * (-1 * _collider.radius);
         }
 
-        private void UpdateProperties()
-        {
-            Radius = _collider.radius;
-            Center = transform.position;
-        }
+        /// <summary>
+        ///   <para>The current relative velocity of the Character (see notes).</para>
+        /// </summary>
+        public Vector3 velocity { get; private set; }
 
-        public float Radius { get; private set; }
-        public Vector3 Center { get; private set; }
+        /// <summary>
+        ///   <para>The center of the character's capsule relative to the transform's position.</para>
+        /// </summary>
+        public Vector3 center => transform.position + Vector3.up * _collider.height / 2;
+
+        /// <summary>
+        ///   <para>The radius of the character's capsule.</para>
+        /// </summary>
+        public float radius => _collider.radius;
     }
 }

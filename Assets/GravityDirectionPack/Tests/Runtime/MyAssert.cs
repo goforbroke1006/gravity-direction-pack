@@ -6,7 +6,7 @@ namespace GravityDirectionPack.Tests.Runtime
 {
     public static class MyAssert
     {
-        public static void InDelta(float actual, float expected, float delta)
+        public static void InDelta(float expected, float actual, float delta)
         {
             delta = Math.Abs(delta);
 

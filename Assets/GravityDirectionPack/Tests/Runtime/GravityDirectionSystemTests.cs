@@ -1,8 +1,8 @@
 using System.Collections;
-using System.Threading;
 using GravityDirectionPack.Scripts;
 using UnityEngine;
 using UnityEngine.TestTools;
+using CharacterController = GravityDirectionPack.Scripts.CharacterController;
 
 namespace GravityDirectionPack.Tests.Runtime
 {
@@ -18,26 +18,23 @@ namespace GravityDirectionPack.Tests.Runtime
                 new object[]
                 {
                     "Falling to ground, decrease along Y",
-                    new Vector3(0.07f, 50, -0.54f),
+                    new Vector3(0.07f, 2.0f, -0.54f),
                     Quaternion.Euler(0, 0, 0),
-                    MyAssert.PositionChangedAxis.Y,
-                    MyAssert.PositionChangedValueDir.Decrease,
+                    new Vector3(0.07f, 0.0f, -0.54f),
                 },
                 new object[]
                 {
                     "Falling to right, increase along X",
-                    new Vector3(-50.91f, 6.52f, -0.534f),
+                    new Vector3(2.0f, 6.5f, -0.5f),
                     Quaternion.Euler(-90, 0, 90),
-                    MyAssert.PositionChangedAxis.X,
-                    MyAssert.PositionChangedValueDir.Increase,
+                    new Vector3(5.0f, 6.5f, -0.5f),
                 },
                 new object[]
                 {
-                    "Falling to left, decrease along X",
-                    new Vector3(2.44f, 6.52f, -0.534f),
-                    Quaternion.Euler(90, -180, 90),
-                    MyAssert.PositionChangedAxis.X,
-                    MyAssert.PositionChangedValueDir.Decrease,
+                    "Falling to forward, increase along Z",
+                    new Vector3(-1.7f, 5.9f, 2.0f),
+                    Quaternion.Euler(-90, 0, 0),
+                    new Vector3(-1.7f, 5.9f, 5.0f),
                 },
             };
 
@@ -54,7 +51,7 @@ namespace GravityDirectionPack.Tests.Runtime
 
             GameObject ch = Object.Instantiate(SceneHelper.GetCharRes());
             var chTransform = ch.transform;
-            GravityDirectionActor gravityDirectionActor = ch.GetComponent<GravityDirectionActor>();
+            var gravityDirectionActor = ch.GetComponent<CharacterController>();
 
             foreach (object[] dataRow in dataRows)
             {
@@ -69,23 +66,20 @@ namespace GravityDirectionPack.Tests.Runtime
 
                 gdsComponent.ReloadControllersList();
 
-                var prevPos = ch.transform.position;
-                for (int i = 0; i < 5; i++)
+                // var prevPos = ch.transform.position;
+                for (int i = 0; i < 15; i++)
                 {
                     yield return null; // update frames
                     camObj.transform.LookAt(ch.transform.position);
-                    Thread.Sleep(200);
-
-                    var currPos = ch.transform.position;
-                    MyAssert.PositionChanged(
-                        prevPos,
-                        currPos,
-                        (MyAssert.PositionChangedAxis)dataRow[3],
-                        (MyAssert.PositionChangedValueDir)dataRow[4]
-                    );
-
-                    prevPos = currPos;
+                    // Thread.Sleep(500);
                 }
+
+                var actualCharPosition = chTransform.position;
+                var expectedTransPosition = (Vector3)dataRow[3];
+
+                MyAssert.InDelta(expectedTransPosition.x, actualCharPosition.x, 0.1f);
+                MyAssert.InDelta(expectedTransPosition.y, actualCharPosition.y, 0.1f);
+                MyAssert.InDelta(expectedTransPosition.z, actualCharPosition.z, 0.1f);
 
                 yield return null; // update frames
             }

@@ -3,13 +3,13 @@ using UnityEngine;
 namespace GravityDirectionPack.Scripts
 {
     /// <summary>
-    /// System that control player character and NPC characters.
+    /// GravityDirectionSystem controls player character and NPC characters.
     /// </summary>
     public class GravityDirectionSystem : MonoBehaviour
     {
-        public float gravityAcceleration = 9.8f;
+        public float GravityAcceleration = 9.8f;
 
-        private GravityDirectionActor[] _controllers;
+        private CharacterController[] _controllers;
 
         // Start is called before the first frame update
         private void Start()
@@ -20,11 +20,11 @@ namespace GravityDirectionPack.Scripts
         // Update is called once per frame
         private void Update()
         {
-            foreach (GravityDirectionActor controller in _controllers)
+            foreach (CharacterController controller in _controllers)
             {
                 if (!controller.grounded)
                 {
-                    controller.fallingSpeed += gravityAcceleration * Time.deltaTime;
+                    controller.fallingSpeed += GravityAcceleration * Time.deltaTime;
                 }
                 else
                 {
@@ -35,13 +35,13 @@ namespace GravityDirectionPack.Scripts
                 Vector3 dir = Vector3.down;
                 Vector3 movement = dir * controller.fallingSpeed;
 
-                controller.Move(movement);
+                controller.Move(movement, Space.Self);
             }
         }
 
         public void ReloadControllersList()
         {
-            _controllers = FindObjectsOfType<GravityDirectionActor>();
+            _controllers = FindObjectsOfType<CharacterController>();
         }
     }
 }

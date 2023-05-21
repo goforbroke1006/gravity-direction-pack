@@ -1,15 +1,15 @@
 using System;
 using System.Collections;
-using GravityDirectionPack.Scripts;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using CharacterController = GravityDirectionPack.Scripts.CharacterController;
 using Object = UnityEngine.Object;
 
 namespace GravityDirectionPack.Tests.Runtime
 {
     // ReSharper disable once InconsistentNaming
-    public class GravityDirectionActorTests_Common
+    public class CharacterControllerTest_Common
     {
         private const float UpdateFrameFastExec = 1.0f;
         private const float UpdateFrameSlowExec = 25.0f;
@@ -31,7 +31,7 @@ namespace GravityDirectionPack.Tests.Runtime
             yield return null;
             yield return null;
 
-            float actualExposedRadius = ch.GetComponent<GravityDirectionActor>().Radius;
+            float actualExposedRadius = ch.GetComponent<CharacterController>().radius;
             float expectedRealCapsuleRadius = ch.GetComponent<CapsuleCollider>().radius;
             Assert.IsTrue(Math.Abs(actualExposedRadius - expectedRealCapsuleRadius) < 0.01f);
 
@@ -51,17 +51,19 @@ namespace GravityDirectionPack.Tests.Runtime
             env.transform.position = Vector3.zero;
 
             GameObject ch = Object.Instantiate(SceneHelper.GetCharRes());
-            ch.transform.position = new Vector3(-1.711f, 0, 1.130581f);
-            yield return null;
-            yield return null;
-            yield return null;
+            ch.transform.position = new Vector3(-1.711f, 2.0f, 1.130581f);
 
-            Vector3 actualCharPosition = ch.GetComponent<GravityDirectionActor>().Center;
-            Vector3 expectedTransPosition = ch.transform.position;
-            Assert.AreEqual(actualCharPosition, expectedTransPosition);
-            Assert.AreEqual(actualCharPosition.x, expectedTransPosition.x);
-            Assert.AreEqual(actualCharPosition.y, expectedTransPosition.y);
-            Assert.AreEqual(actualCharPosition.z, expectedTransPosition.z);
+            for (int idx = 0; idx < 100; idx++)
+            {
+                yield return null;
+            }
+
+            var actualCharPosition = ch.GetComponent<CharacterController>().center;
+            var expectedTransPosition = new Vector3(-1.711f, 2.9f, 1.130581f);
+            Assert.AreEqual(expectedTransPosition, actualCharPosition);
+            Assert.AreEqual(expectedTransPosition.x, actualCharPosition.x);
+            Assert.AreEqual(expectedTransPosition.y, actualCharPosition.y);
+            Assert.AreEqual(expectedTransPosition.z, actualCharPosition.z);
 
             SceneHelper.ClearScene();
             yield return null;
@@ -84,7 +86,7 @@ namespace GravityDirectionPack.Tests.Runtime
             GameObject ch = Object.Instantiate(SceneHelper.GetCharRes());
             ch.transform.position = new Vector3(-1.711f, 0, 1.130581f);
             yield return null;
-            Assert.IsTrue(ch.GetComponent<GravityDirectionActor>().grounded);
+            Assert.IsTrue(ch.GetComponent<CharacterController>().grounded);
 
             SceneHelper.ClearScene();
             yield return null;
@@ -106,7 +108,7 @@ namespace GravityDirectionPack.Tests.Runtime
 
             yield return null;
 
-            Assert.IsFalse(ch.GetComponent<GravityDirectionActor>().grounded);
+            Assert.IsFalse(ch.GetComponent<CharacterController>().grounded);
 
             SceneHelper.ClearScene();
             yield return null;
@@ -129,7 +131,7 @@ namespace GravityDirectionPack.Tests.Runtime
 
             yield return null;
 
-            Assert.IsTrue(ch.GetComponent<GravityDirectionActor>().grounded);
+            Assert.IsTrue(ch.GetComponent<CharacterController>().grounded);
 
             SceneHelper.ClearScene();
             yield return null;
@@ -141,7 +143,7 @@ namespace GravityDirectionPack.Tests.Runtime
     /// Verify manual collision detecting works fine.
     /// </summary>
     // ReSharper disable once InconsistentNaming
-    public class GravityDirectionActorTests_Move
+    public class CharacterControllerTest_Move
     {
         private class ActorTestCache
         {
@@ -173,8 +175,8 @@ namespace GravityDirectionPack.Tests.Runtime
 
             yield return new WaitForSeconds(2.0f);
 
-            Assert.IsTrue(ch.GetComponent<GravityDirectionActor>().grounded);
-            MyAssert.InDelta(ch.transform.position.y, 0, MaxStuckInFloorDelta);
+            Assert.IsTrue(ch.GetComponent<CharacterController>().grounded);
+            MyAssert.InDelta(0, ch.transform.position.y, MaxStuckInFloorDelta);
 
             SceneHelper.ClearScene();
             yield return null;
@@ -200,8 +202,8 @@ namespace GravityDirectionPack.Tests.Runtime
 
             yield return new WaitForSeconds(2.0f);
 
-            Assert.IsTrue(ch.GetComponent<GravityDirectionActor>().grounded);
-            MyAssert.InDelta(ch.transform.position.x, 5.0f, MaxStuckInFloorDelta);
+            Assert.IsTrue(ch.GetComponent<CharacterController>().grounded);
+            MyAssert.InDelta(5.0f, ch.transform.position.x, MaxStuckInFloorDelta);
 
             SceneHelper.ClearScene();
             yield return null;
@@ -299,7 +301,7 @@ namespace GravityDirectionPack.Tests.Runtime
 
             GameObject ch = Object.Instantiate(SceneHelper.GetCharRes());
             var chTransform = ch.transform;
-            GravityDirectionActor gravityDirectionActor = ch.GetComponent<GravityDirectionActor>();
+            var gravityDirectionActor = ch.GetComponent<CharacterController>();
 
             foreach (object[] dataRow in dataRows)
             {
@@ -324,8 +326,8 @@ namespace GravityDirectionPack.Tests.Runtime
 
                 yield return null;
 
-                float charMaxXWithRadiusPadding = chTransform.position.x + gravityDirectionActor.Radius;
-                float charMaxZWithRadiusPadding = chTransform.position.z + gravityDirectionActor.Radius;
+                float charMaxXWithRadiusPadding = chTransform.position.x + gravityDirectionActor.radius;
+                float charMaxZWithRadiusPadding = chTransform.position.z + gravityDirectionActor.radius;
 
                 const float floatFault = 0.015f; // TODO: should assert without correction
 
@@ -351,7 +353,7 @@ namespace GravityDirectionPack.Tests.Runtime
                     Name = "Move face forward to corner between walls, movement angle 45 degrees",
                     CharacterPosition = new Vector3(-2.0f, 0.0f, 2.0f),
                     CharacterRotation = Quaternion.Euler(0, 45, 0),
-                    CharMoveDir = Vector3.forward,
+                    CharMoveDir = (Vector3.forward + Vector3.right).normalized,
                 },
             };
 
@@ -365,7 +367,7 @@ namespace GravityDirectionPack.Tests.Runtime
 
             var ch = Object.Instantiate(SceneHelper.GetCharRes());
             var chTransform = ch.transform;
-            var gravityDirectionActor = ch.GetComponent<GravityDirectionActor>();
+            var gravityDirectionActor = ch.GetComponent<CharacterController>();
 
             foreach (var dataRow in dataRows)
             {
